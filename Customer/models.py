@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
@@ -23,7 +24,7 @@ class CustomAccountManager(BaseUserManager):
         if not username:
             raise ValueError(_('You must provide a username'))
 
-        user = self.model(username=username, **other_fields)
+        user = self.model(username=username, password=password,**other_fields)
         user.set_password(password)
         user.save()
         return user
@@ -31,15 +32,19 @@ class CustomAccountManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
 
-    userName= models.CharField(max_length=200, unique=True)
-    firstName = models.CharField(max_length=200, blank=True, null=True)
+    username= models.CharField(max_length=200, unique=True)
+    firstname = models.CharField(max_length=200, blank=True, null=True)
     email = models.EmailField(max_length=250, unique=True, blank=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
+    start_date = models.DateTimeField(default=timezone.now)
+    token = models.TextField(blank=True)
     objects = CustomAccountManager()
-    USERNAME_FIELD = 'userName'
-    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
-        return self.userName
+        return self.username
 
 class Product(models.Model):
     productName = models.CharField(unique=True, max_length=200)
