@@ -6,6 +6,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'password')
+        extra_kwargs = {'password': {'write_only':True}}
 
     def create_user(self, validated_data):
         password = validated_data.pop('password', None) #popped out so it will not be in the instance model
